@@ -240,21 +240,6 @@
   let timerId = null;
   let showAnswer = false;
 
-  let autoNextTimeoutId = null;
-
-  function clearAutoNext() {
-    if (autoNextTimeoutId) {
-      clearTimeout(autoNextTimeoutId);
-      autoNextTimeoutId = null;
-    }
-  }
-
-  function getAutoNextDelaySeconds() {
-    const checked = document.querySelector('input[name="autoNext"]:checked');
-    const v = checked ? parseInt(checked.value, 10) : 10;
-    return Number.isFinite(v) ? v : 10;
-  }
-
   const $ = (id) => document.getElementById(id);
 
   function resetDeck(shuffle=true) {
@@ -280,18 +265,8 @@
         remaining = 0;
         showAnswer = true;
         stopTimer();
-        render();
-
-        // ✅ 정답 표시 후 N초 뒤 자동 다음
-        clearAutoNext();
-        const delaySec = getAutoNextDelaySeconds();
-        autoNextTimeoutId = setTimeout(() => {
-        drawNext(); // 다음 문제로 자동 이동 + 타이머 60초 재시작
-      }, delaySec * 1000);
-
-  return; // 여기서 끝 (아래 render() 중복 방지)
-}
-render();
+      }
+      render();
     }, 1000);
     render();
   }
@@ -302,7 +277,6 @@ render();
     // ✅ 타이머 남아도 다음 가능: 다음 눌렀을 때 타이머 즉시 리셋
     // (그래서 여기서 stopTimer() 먼저)
     stopTimer();
-    clearAutoNext(); // ✅ 자동 다음 예약 취소
 
     if (deckPos >= deck.length) resetDeck(true); // 한 바퀴 끝나면 다시 섞기
     currentIndex = deck[deckPos++];
@@ -313,7 +287,6 @@ render();
   }
 
   function restartTimerOnly() {
-    clearAutoNext(); // ✅ 자동 다음 예약 취소
     startTimer();
   }
 
@@ -342,19 +315,6 @@ render();
       : "";
   }
 
-  <div style="margin-top:12px;">
-  <div class="muted" style="margin-bottom:6px;">정답 표시 후 자동 다음(초)</div>
-  <label style="margin-right:14px;">
-    <input type="radio" name="autoNext" value="10" checked> 10초
-  </label>
-  <label style="margin-right:14px;">
-    <input type="radio" name="autoNext" value="20"> 20초
-  </label>
-    <label>
-      <input type="radio" name="autoNext" value="30"> 30초
-    </label>
-  </div>
-  
   $("nextBtn").addEventListener("click", drawNext);
   $("restartBtn").addEventListener("click", restartTimerOnly);
   $("showAnswerBtn").addEventListener("click", toggleAnswer);
@@ -366,6 +326,3 @@ render();
 </script>
 </body>
 </html>
-
-
-
